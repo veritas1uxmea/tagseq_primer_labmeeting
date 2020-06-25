@@ -1,5 +1,10 @@
-[Get reference genome, transcript to gene id files setup]
+[Install Misha Matz's script]
 
+git clone https://github.com/z0on/tag-based_RNAseq.git
+# it will probably save this folder in the home directory (~/tag-based_RNAseq)
+
+
+[Get reference genome, transcript to gene id files setup]
 
 mkdir reference
 cd reference
@@ -12,15 +17,15 @@ find . -name '*.gz' -exec gunzip '{}' \;
 bowtie2-build Mus_musculus.GRCm38.cdna.all.fa transcriptome.fasta 
 # creating bowtie2 index for your transcriptome:
 
-wget 
+wget https://github.com/veritas1uxmea/tagseq_primer_labmeeting/raw/master/Raw_data_processing/transcript_to_geneid_grcm38_98.tab
 
 [Make folders to toss around processed files]==================================================================
 
 mkdir working
 mkdir working_fastq
 mkdir working_fq
+mkdir working_trim
 mkdir working_sam
-mkdir working_fixed_sam
 
 
 [Add Misha Matz's script in the PATH so the computer can find the functions/scripts he wrote]===========
@@ -56,7 +61,7 @@ find . -name '*.fastq' -exec mv {} ~/working \;
 ## NEED to customize ===================================================
 
 
-ngs_concat.pl 'W-' '(.+)_S'
+ngs_concat.pl '-' '(.+)_S'
 # concatenating the corresponding fastq files by sample:
 # "FilenameTextImmediatelyBeforeSampleID(.+)FilenameTextImmediatelyAfterSampleID"
 
@@ -72,7 +77,7 @@ echo "tagseq_clipper.pl $F | cutadapt - -a AAAAAAAA -a AGATCGG -q 15 -m 25 -o ${
 done
 # create a bash script to clean out adaptor sequences with CUTADAPT
 
-bash clean
+bash clean |& tee -a clean_output.txt
 #execute the script for the files in the working directory ('working')
 
 find . -name '*.fq' -exec mv {} ~/working_fq \;
@@ -87,24 +92,16 @@ bash maps |& tee -a maps_output.txt
 
 find . -name '*.trim' -exec mv {} ~/working_trim \;
 
+perl -pi -e 's/(ENSMUST\d+)\.\d+/\1/g' *.trim.sam
+# long story short, need to delete the 'version info of transcript'
+# ex) ENSMUST00000082414.1 --> ENSMUST00000082414
 
-## Need to do some editting with R and stuff 
-## example: 
-
-
-
-
-find . -name '*.trim.sam' -exec mv {} ~/working_sam \;
-
-
-samcount_launch_bt2.pl '\.sam' ~/transcript_to_geneid_grcm38_98.tab > sc
+samcount_launch_bt2.pl '\.sam' ~/reference/transcript_to_geneid_grcm38_98.tab > sc
 
 bash sc
 
-`
-find . -name '*_fixed.sam' -exec mv {} ~/working_fixed_sam \;
+find . -name '*.sam' -exec mv {} ~/working_sam \;
  
-
 expression_compiler.pl *.sam.counts > allcounts.txt
 
 
