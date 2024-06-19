@@ -4,20 +4,24 @@ git clone https://github.com/z0on/tag-based_RNAseq.git
 # it will probably save this folder in the home directory (~/tag-based_RNAseq)
 
 
-[Get reference genome, transcript to gene id files setup]
+[Get reference genome, transcript to gene id files setup] # Updated 20240619 (using chatGPT)
+#!/bin/bash
 
-mkdir reference
+# Create and navigate to the reference directory
+mkdir -p reference
 cd reference
 
+# Download the latest mouse transcriptome reference genome
+wget ftp://ftp.ensembl.org/pub/release-110/fasta/mus_musculus/cdna/Mus_musculus.GRCm39.cdna.all.fa.gz
 
-wget ftp://ftp.ensembl.org/pub/release-100/fasta/mus_musculus/cdna/Mus_musculus.GRCm38.cdna.all.fa.gz
+# Unzip the downloaded file
 find . -name '*.gz' -exec gunzip '{}' \;
 
+# Create Bowtie2 index for the transcriptome
+bowtie2-build Mus_musculus.GRCm39.cdna.all.fa transcriptome.fasta 
 
-bowtie2-build Mus_musculus.GRCm38.cdna.all.fa transcriptome.fasta 
-# creating bowtie2 index for your transcriptome:
-
-wget https://github.com/veritas1uxmea/tagseq_primer_labmeeting/raw/master/Raw_data_processing/transcript_to_geneid_grcm38_98.tab
+# Download the latest transcript-to-gene ID mapping file
+wget https://github.com/veritas1uxmea/tagseq_primer_labmeeting/raw/master/Raw_data_processing/transcript_to_geneid_grcm39_110.tab
 
 [Make folders to toss around processed files]==================================================================
 
