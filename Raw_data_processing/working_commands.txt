@@ -1,10 +1,11 @@
-[Install Misha Matz's script]
+[Install Misha Matz's script]==========================================================================================
 
 git clone https://github.com/z0on/tag-based_RNAseq.git
 # it will probably save this folder in the home directory (~/tag-based_RNAseq)
 
 
-[Get reference genome, transcript to gene id files setup] # Updated 20240619 (using chatGPT)
+[Get reference genome, transcript to gene id files setup] ==========================================================================================
+# Updated 20240619 (using chatGPT)
 #!/bin/bash
 
 # Create and navigate to the reference directory
@@ -22,6 +23,31 @@ bowtie2-build Mus_musculus.GRCm39.cdna.all.fa transcriptome.fasta
 
 # Download the latest transcript-to-gene ID mapping file
 wget https://github.com/veritas1uxmea/tagseq_primer_labmeeting/raw/master/Raw_data_processing/transcript_to_geneid_grcm39_110.tab
+
+
+
+[Human transcriptome] ==========================================================================================
+#!/bin/bash
+
+# Create and navigate to the human reference directory
+mkdir -p reference_human
+cd reference_human
+
+# Download the latest human transcriptome reference genome
+wget ftp://ftp.ensembl.org/pub/release-110/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz
+
+# Unzip the downloaded file
+find . -name '*.gz' -exec gunzip '{}' \;
+
+# Create Bowtie2 index for the transcriptome
+bowtie2-build Homo_sapiens.GRCh38.cdna.all.fa transcriptome_human.fasta 
+
+# Download the latest transcript-to-gene ID mapping file
+wget https://github.com/veritas1uxmea/tagseq_primer_labmeeting/raw/master/Raw_data_processing/transcript_to_geneid_grch38_110.tab
+
+
+
+
 
 [Make folders to toss around processed files]==================================================================
 
